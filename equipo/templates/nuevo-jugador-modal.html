@@ -1,0 +1,94 @@
+<div class="modal" id="nuevoJugador">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Nuevo Jugador</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        
+        <div class="modal-body">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-6">
+              <label for="nombre">Nombre</label>
+              <input type="text" id="nombre">
+            </div>
+            <div class="col-6">
+              <label for="fecha">fecha de nacimiento</label>
+              <input type="date" id="fecha">
+            </div>
+          </div>
+          <div class="row">
+              <div class="col-6">
+                  <label for="numero">numero</label>
+                  <br>
+                  <select id="numero">
+                    <option value="0">Seleccione...</option>
+                    {% for n in numeros%}
+                      <option value="{{n}}">{{n}}</option>
+                    {%endfor%}
+                  </select>
+              </div>
+              <div class="col-6">
+                  <label for="numero">Posicion</label>
+                  <br>
+                  <select name="posicion" id="posicion">
+                      <option value="0">Seleccione...</option>
+                      {%for p in posiciones%}
+                          <option value="{{p.posicion}}">{{p.posicion}}</option>
+                      {%endfor%}
+                  </select>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-6">
+              </div>
+              <div class="col-6"></div>
+          </div>
+
+
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="crearJugador()">Guardar</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div id="respuesta"></div>
+<script>
+  const crearJugador=()=>{
+    let nombre = document.getElementById('nombre').value;
+    let fecha = document.getElementById('fecha').value;
+    let numero = document.getElementById('numero').value;
+    let posicion = document.getElementById('posicion').value;
+    if (nombre!='' && fecha!='') {
+      data = {'nombre':nombre,'fecha':fecha,'numero':numero,'posicion':posicion}
+      $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+        }
+      });
+
+      $.ajax({
+        type: "POST",
+        url: "crear-nuevo-jugador/",
+        data: {'nombre':nombre,'fecha':fecha,'numero':numero,'posicion':posicion},
+        success: function(data) {
+            $('#respuesta').html(data);
+        }
+      })
+    }
+    else{
+      swal("Error", "Complete los campos para enviar el formulario", "error");
+    }
+  }
+</script>

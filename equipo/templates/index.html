@@ -1,0 +1,111 @@
+<header>
+    {%extends 'plantilla.html' %}
+</header>
+{%block content%}
+<article>
+    <section class="banner">
+        <img src="https://tecolotito.elsiglodetorreon.com.mx/i/2022/07/1580068.jpeg" alt="banner">
+    </section>
+</article>
+<article class="container p-3">
+    <section>
+        <div class="text-center">
+            <h2>Jugadores del 1er Equipo</h2>
+            <hr>
+        </div>
+        <div>
+            <a class="btn btn-primary" onclick="nuevoJugador()">
+                <i class="fa-solid fa-user-plus"></i> Agregar Jugador
+            </a>
+        </div>
+        <div class="pt-3">
+            <table id="example" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Number</th>
+                        <th>Birthday</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for x in lista%}
+                    {% csrf_token %}
+                        {%if x.estado == 'A'%}
+                        <tr>
+                            <th id="nombre{{x.id}}" value="{{x.nombre}}">{{x.nombre}}</th>
+                            <th id="posicion{{x.id}}">{{x.posicion}}</th>
+                            <th id="numero{{x.id}}">{{x.numero}}</th>
+                            <th id="fecha{{x.id}}">{{x.fecha_nacimiento}}</th> 
+                            <th>    
+                                <button type="button" class="btn btn-primary" value="{{x.id}}" onclick='obtenerDatos("{{x.id}}")'>
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                               <button type="button" class="btn btn-danger" value="{{x.id}}" onclick='borrarJugador("{{x.id}}")'>
+                                <i class="fa-solid fa-trash"></i>
+                               </button>
+                            </th>
+                        </tr>
+                        {%endif%}
+                    {%endfor%}
+                </tbody>
+            </table> 
+        </div>
+    </section>
+</article>
+
+<div id="modal-content"></div>
+
+<script>
+    const obtenerDatos=(x)=>{
+        var variable = x;
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+            xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+            }
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "actualizar-jugador-modal/",
+            data: { variable: variable },
+            success: function(data) {
+                $('#modal-content').html(data);
+                // Muestra la ventana modal
+                 $('#modal').modal('show');
+            }
+        })
+    }
+
+    const borrarJugador=(x)=>{
+        var variable = x;
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+            xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+            }
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "eliminar-jugado/",
+            data: { variable: variable },
+            success: function(data) {
+                $('#modal-content').html(data);
+            }
+        })
+    }
+
+    const nuevoJugador=()=>{
+        $.ajax({
+        url: 'nuevo-jugador-modal/',
+        type: 'get',
+        success: function(data) {
+            $('#modal-content').html(data);
+            $('#nuevoJugador').modal('show');
+        }
+    });
+    }
+    
+</script>
+{%endblock%}

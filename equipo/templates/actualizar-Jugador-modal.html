@@ -1,0 +1,83 @@
+<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Actualizar</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-6">
+                    <label for="id">Codigo</label>
+                    <input type="text" value="{{id}}" id="codigo" readonly>
+                </div>
+                <div class="col-6">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" value="{{datos.nombre}}" id="nombre">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="numero">numero</label>
+                    <input type="text" value="{{datos.numero}}" id="numero">
+                </div>
+                <div class="col-6">
+                    <label for="fecha">fecha de nacimiento</label>
+                    <input type="text" value="{{datos.fecha_nacimiento}}" id="fecha" readonly>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="numero">Posicion</label>
+                    <br>
+                    <select name="posicion" id="posicion">
+                        <option value="{{datos.posicion}}">{{datos.posicion}}</option>
+                        {%for p in posiciones%}
+                        {%if p.posicion != datos.posicion%}
+                            <option value="{{p.posicion}}">{{p.posicion}}</option>
+                        {%endif%}
+                        {%endfor%}
+                    </select>
+                </div>
+                <div class="col-6"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary" onclick="obtener()">Guardar</button>
+        </div>
+        </div>
+    </div>
+</div>
+<div id="respuesta"></div>
+<script>
+    const obtener=()=>{
+        let id = document.getElementById('codigo').value;
+        let nombre = document.getElementById('nombre').value;
+        let fecha = document.getElementById('fecha').value;
+        let numero = document.getElementById('numero').value;
+        let posicion = document.getElementById('posicion').value;
+
+        data={'id':id,'nombre':nombre,'fecha':fecha,'numero':numero,'posicion':posicion}
+        console.log(data)
+
+        if (nombre!='' && fecha!='' && numero!=0 && posicion!='') {
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                }
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "actualizar-proceso/",
+                data: {'id':id,'nombre':nombre,'fecha':fecha,'numero':numero,'posicion':posicion},
+                success: function(data) {
+                    $('#respuesta').html(data);
+                }
+            })
+        }
+        else{ swal("Error", "Complete los campos para enviar el formulario", "error"); }
+    }
+</script>
